@@ -46,7 +46,10 @@ dev_dependencies:
   # rules and activating additional ones.
   audioplayers: ^0.20.1
   flutter_lints: ^5.0.0
-
+  firebase_core: 
+  cloud_firestore:
+  firebase_storage:
+  
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

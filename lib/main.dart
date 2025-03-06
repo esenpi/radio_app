@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:radio_app/pages/login_page.dart';
 import 'package:radio_app/pages/playlist_page.dart';
 import 'package:radio_app/pages/radio_page.dart';
-
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
   runApp(const MyApp());
 }
 
@@ -107,7 +114,23 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: _pages.elementAt(_selectedIndex),
+        // child: _pages.elementAt(_selectedIndex),
+        child: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance.collection('test').doc('testDoc').get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return Text('Document does not exist');
+            }
+            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+            return Text('Document data: ${data['song']}');
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
@@ -135,5 +158,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
     );
+  }
+  Future<String> _getImageUrl() async {
+    final ref = FirebaseStorage.instance.ref().child('test_image.jpg');
+    return await ref.getDownloadURL();
   }
 }

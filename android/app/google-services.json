@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "301682719143",
+    "project_id": "radio-app-bf3b2",
+    "storage_bucket": "radio-app-bf3b2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301682719143:android:17e7b5a4ae299bb4ad9e82",
+        "android_client_info": {
+          "package_name": "com.example.radio_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQliPBQtrajS4kgvSh1d_lpvxcTzn0ZPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
