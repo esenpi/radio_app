@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:firebase_core/firebase_core.dart';
+// import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class RadioPage extends StatefulWidget {
   const RadioPage({super.key});
@@ -66,7 +70,20 @@ class _RadioPageState extends State<RadioPage> {
       appBar: AppBar(
         title: Text('Radio Player'),
       ),
-      body: Padding(
+      body: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance.collection('test').doc('testDoc').get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return Text('Document does not exist');
+            }
+            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+            return Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -90,10 +107,10 @@ class _RadioPageState extends State<RadioPage> {
                 ),
               ),
             ),
-            //SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
-              'Titleeeee · Interpreter · Album', // Replace with actual song title if available
-              style: TextStyle(fontSize: 20),
+              "${data['song'] } · ${data['interpreter'] } · ${data['album'] }", 
+              style: TextStyle(fontSize: 17),
             ),
             SizedBox(height: 16),
             Slider(
@@ -135,7 +152,11 @@ class _RadioPageState extends State<RadioPage> {
             ),
           ],
         ),
-      ),
+      );
+          },
+        ),
     );
   }
 }
+
+

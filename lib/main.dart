@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:radio_app/pages/login_page.dart';
 import 'package:radio_app/pages/playlist_page.dart';
 import 'package:radio_app/pages/radio_page.dart';
@@ -6,39 +7,29 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'song/song_page.dart';
+import 'song/song_screen.dart';
+import 'song/song_repository.dart';
+import 'song/song_bloc.dart';
+import 'song/song_event.dart';
+import 'song/song_state.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'radio app',
       theme: ThemeData(
-
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
@@ -50,15 +41,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -68,99 +50,69 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   int _selectedIndex = 0;
+  final SongRepository _songRepository = SongRepository();
+  late final SongBloc _songBloc;
+  late final List<Widget> _pages;
 
-  static List<Widget> _pages = <Widget>[
-    const LoginPage(),
-    const RadioPage(),
-    const PlaylistPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _songBloc = SongBloc(UnSongState());
+    _pages = <Widget>[
+      SongScreen(songBloc: _songBloc, docId: 'AjJnO7qwwbCCFvdlF6ah', songRepository: _songRepository),
+      const RadioPage(),
+      const PlaylistPage(),
+    ];
+  }
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
 
-   void _onItemTapped(int index) {
+  void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      print('Selected index: $index');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        // child: _pages.elementAt(_selectedIndex),
-        child: FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance.collection('test').doc('testDoc').get(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            }
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            }
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return Text('Document does not exist');
-            }
-            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-            return Text('Document data: ${data['song']}');
-          },
+    return BlocProvider(
+      create: (context) => _songBloc..add(LoadSongEvent('AjJnO7qwwbCCFvdlF6ah', _songRepository)),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: _pages.elementAt(_selectedIndex),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _incrementCounter,
+          tooltip: 'Increment',
+          child: const Icon(Icons.add),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.login),
+              label: 'Login',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.radar_outlined),
+              label: 'Radio',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.queue_music),
+              label: 'Playlist',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          onTap: _onItemTapped,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-      
-      bottomNavigationBar: BottomNavigationBar(items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.login),
-          label: 'Login',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.radar_outlined),
-          label: 'Radio',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.queue_music),
-          label: 'Playlist',
-        ),
-      ],
-      currentIndex: _selectedIndex,
-      selectedItemColor: Theme.of(context).colorScheme.primary,
-      onTap: _onItemTapped,
-      ),
-
     );
-  }
-  Future<String> _getImageUrl() async {
-    final ref = FirebaseStorage.instance.ref().child('test_image.jpg');
-    return await ref.getDownloadURL();
   }
 }
