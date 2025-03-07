@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import'package:radio_app/model/song.dart';
 
 abstract class SongState extends Equatable {
   SongState();
@@ -31,6 +32,18 @@ class InSongState extends SongState {
 
   @override
   List<Object> get props => [title, interpreter, album, thumbnailUrl, songUrl];
+}
+
+class AllSongsLoadedState extends SongState {
+  final List<String> documentIDs;
+
+  AllSongsLoadedState(this.documentIDs);
+}
+
+class SongLoadedState extends SongState {
+  final Song song;
+
+  SongLoadedState(this.song);
 }
 
 class ErrorSongState extends SongState {

@@ -6,12 +6,19 @@ import 'package:radio_app/model/song.dart';
 class SongRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<List<String>> fetchAllDocumentIDs() async {
+    QuerySnapshot snapshot = await _firestore.collection('songs').get();
+    return snapshot.docs.map((doc) => doc.id).toList();
+  }
+
   Future<Song> fetchSong(String docId) async {
-    DocumentSnapshot snapshot = await _firestore.collection('songs').doc(docId).get();
-    if (snapshot.exists) {
-      return Song.fromMap(snapshot.data() as Map<String, dynamic>);
-    } else {
-      throw Exception('Song not found');
-    }
+    DocumentSnapshot doc = await _firestore.collection('songs').doc(docId).get();
+    return Song(
+      title: doc['title'],
+      album: doc['album'],
+      interpreter: doc['interpreter'],
+      songUrl: doc['songUrl'],
+      thumbnailUrl: doc['thumbnailUrl'],
+    );
   }
 }

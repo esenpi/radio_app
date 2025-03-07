@@ -57,9 +57,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _songBloc = SongBloc(UnSongState());
+    _songBloc = SongBloc(_songRepository);
+
+    _songBloc.add(LoadAllSongsEvent( _songRepository));
+
+    
     _pages = <Widget>[
-      SongScreen(songBloc: _songBloc, docId: 'AjJnO7qwwbCCFvdlF6ah', songRepository: _songRepository),
+      SongScreen(songBloc: _songBloc, songRepository: _songRepository),
       const RadioPage(),
       const PlaylistPage(),
     ];
@@ -80,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => _songBloc..add(LoadSongEvent('AjJnO7qwwbCCFvdlF6ah', _songRepository)),
+      create: (context) => _songBloc,
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),

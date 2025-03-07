@@ -7,13 +7,11 @@ import 'package:radio_app/song/song_repository.dart';
 
 class SongScreen extends StatefulWidget {
   final SongBloc _songBloc;
-  final String docId;
   final SongRepository _songRepository;
 
   const SongScreen({
     Key? key,
     required SongBloc songBloc,
-    required this.docId,
     required SongRepository songRepository,
   })  : _songBloc = songBloc,
         _songRepository = songRepository,
@@ -27,11 +25,15 @@ class _SongScreenState extends State<SongScreen> {
   @override
   void initState() {
     super.initState();
-    _load();
+    _loadAllSongs();
   }
 
-  void _load() {
-    widget._songBloc.add(LoadSongEvent(widget.docId, widget._songRepository));
+  void _loadAllSongs() {
+    widget._songBloc.add(LoadAllSongsEvent(widget._songRepository));
+  }
+
+  void _loadNextSong() {
+    widget._songBloc.add(LoadNextSongEvent("FJRJZCVV74YjGuiG2sLL", widget._songRepository));
   }
 
   @override
@@ -40,43 +42,39 @@ class _SongScreenState extends State<SongScreen> {
       appBar: AppBar(
         title: Text('Song Details'),
       ),
-      body: BlocBuilder<SongBloc, SongState>(
-        bloc: widget._songBloc,
-        builder: (context, state) {
-          if (state is UnSongState) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state is InSongState) {
-            return Center(
-              child: Column(
+      body: Center(
+        child: BlocBuilder<SongBloc, SongState>(
+          bloc: widget._songBloc,
+          builder: (context, state) {
+            print('Current state: $state'); // Log the current state
+
+            if (state is UnSongState) {
+              return CircularProgressIndicator();
+            } else if (state is AllSongsLoadedState) {
+              return Text('All songs loaded. Click Next to fetch song details.');
+            } else if (state is SongLoadedState) {
+              return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(state.title),
-                  Text(state.interpreter),
-                  Text(state.album),
-                  Text(state.songUrl),
-                  // Image.network(state.thumbnailUrl),
-                ],
-              ),
-            );
-          } else if (state is ErrorSongState) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(state.errorMessage),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 32.0),
-                    child: ElevatedButton(
-                      child: Text('Reload'),
-                      onPressed: _load,
-                    ),
+                children: [
+                  Text('Title: ${state.song.title}'),
+                  Text('Album: ${state.song.album}'),
+                  Text('Interpreter: ${state.song.interpreter}'),
+                  Text('Song URL: ${state.song.songUrl}'),
+                  Text('Thumbnail URL: ${state.song.thumbnailUrl}'),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _loadNextSong,
+                    child: Text('Next'),
                   ),
                 ],
-              ),
-            );
-          }
-          return Center(child: CircularProgressIndicator());
-        },
+              );
+            } else if (state is ErrorSongState) {
+              return Text('Error: ${state.errorMessage}');
+            } else {
+              return Text('Unknown state');
+            }
+          },
+        ),
       ),
     );
   }

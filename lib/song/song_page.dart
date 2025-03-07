@@ -10,7 +10,7 @@ class SongPage extends StatefulWidget {
 }
 
 class _SongPageState extends State<SongPage> {
-  final _songBloc = SongBloc(UnSongState());
+  final _songBloc = SongBloc(SongRepository());
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class _SongPageState extends State<SongPage> {
       appBar: AppBar(
         title: Text('Song'),
       ),
-      body: SongScreen(songBloc: _songBloc, docId: 'AjJnO7qwwbCCFvdlF6ah', songRepository: SongRepository()),
+      body: SongScreen(songBloc: _songBloc, songRepository: SongRepository()),
     );
   }
 }
