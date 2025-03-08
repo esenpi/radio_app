@@ -24,6 +24,10 @@ class LoadNextSongEvent extends SongEvent {
   const LoadNextSongEvent();
 }
 
+class LoadPreviousSongEvent extends SongEvent {
+  const LoadPreviousSongEvent();
+}
+
 class LoadingSongState extends SongState {
   LoadingSongState();
   @override

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,7 +45,7 @@ class _RadioPageState extends State<RadioPage> {
     if (isPlaying) {
       _audioPlayer.pause();
     } else {
-      _audioPlayer.play(url); // Replace with your stream URL
+      _audioPlayer.play(url); 
     }
     setState(() {
       isPlaying = !isPlaying;
@@ -66,7 +65,7 @@ class _RadioPageState extends State<RadioPage> {
   }
 
   void _backward() {
-    // Implement backward functionality if applicable
+    widget._songBloc.add(LoadPreviousSongEvent());
   }
 
   @override
@@ -81,7 +80,15 @@ class _RadioPageState extends State<RadioPage> {
       body: BlocBuilder<SongBloc, SongState>(
           bloc: widget._songBloc,
           builder: (context, state) {
+             if (state is UnSongState) {
+              // uninitialised state
+              return CircularProgressIndicator();
+            } else if (state is LoadingSongState) {
+              // loading state
+              return CircularProgressIndicator();
+            } 
             if (state is SongLoadedState) {
+              // loaded state
             return Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(

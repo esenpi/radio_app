@@ -46,5 +46,19 @@ class SongBloc extends Bloc<SongEvent, SongState> {
       }
     });
 
+    on<LoadPreviousSongEvent>((event, emit) async {
+      try {
+        emit(LoadingSongState());
+        if (currentIndex > 0) {
+          currentIndex--;
+        } else {
+          currentIndex = songs.length - 1; // Zum letzten Song, wenn der Anfang der Liste erreicht ist
+        }
+        emit(SongLoadedState(songs[currentIndex]));
+      } catch (error) {
+        emit(ErrorSongState(error.toString()));
+      }
+    });
+
   }
 }
