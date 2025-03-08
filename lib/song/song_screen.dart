@@ -3,18 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:radio_app/song/song_bloc.dart';
 import 'package:radio_app/song/song_event.dart';
 import 'package:radio_app/song/song_state.dart';
-import 'package:radio_app/song/song_repository.dart';
 
 class SongScreen extends StatefulWidget {
   final SongBloc _songBloc;
-  final SongRepository _songRepository;
 
   const SongScreen({
     Key? key,
     required SongBloc songBloc,
-    required SongRepository songRepository,
   })  : _songBloc = songBloc,
-        _songRepository = songRepository,
         super(key: key);
 
   @override
@@ -28,7 +24,7 @@ class _SongScreenState extends State<SongScreen> {
   @override
   void initState() {
     super.initState();
-    _loadAllSongs();
+    // _loadAllSongs();
   }
 
   void _loadAllSongs() {

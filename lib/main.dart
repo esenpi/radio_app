@@ -60,11 +60,10 @@ class _MyHomePageState extends State<MyHomePage> {
     _songBloc = SongBloc(_songRepository);
 
     _songBloc.add(LoadAllSongsEvent());
-    // _songBloc.add(LoadNextSongEvent("FJRJZCVV74YjGuiG2sLL", _songRepository));
     
     _pages = <Widget>[
-      SongScreen(songBloc: _songBloc, songRepository: _songRepository),
-      const RadioPage(),
+      SongScreen(songBloc: _songBloc),
+      RadioPage(songBloc: _songBloc),
       const PlaylistPage(),
     ];
   }

@@ -18,7 +18,7 @@ class _SongPageState extends State<SongPage> {
       appBar: AppBar(
         title: Text('Song'),
       ),
-      body: SongScreen(songBloc: _songBloc, songRepository: SongRepository()),
+      body: SongScreen(songBloc: _songBloc),
     );
   }
 }
