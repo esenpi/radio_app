@@ -59,8 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _songBloc = SongBloc(_songRepository);
 
-    _songBloc.add(LoadAllSongsEvent( _songRepository));
-
+    _songBloc.add(LoadAllSongsEvent());
+    // _songBloc.add(LoadNextSongEvent("FJRJZCVV74YjGuiG2sLL", _songRepository));
     
     _pages = <Widget>[
       SongScreen(songBloc: _songBloc, songRepository: _songRepository),

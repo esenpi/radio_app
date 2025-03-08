@@ -22,6 +22,9 @@ class SongScreen extends StatefulWidget {
 }
 
 class _SongScreenState extends State<SongScreen> {
+  List<String> _documentIds = [];
+  int _currentIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -29,12 +32,26 @@ class _SongScreenState extends State<SongScreen> {
   }
 
   void _loadAllSongs() {
-    widget._songBloc.add(LoadAllSongsEvent(widget._songRepository));
+    widget._songBloc.add(LoadAllSongsEvent());
   }
 
   void _loadNextSong() {
-    widget._songBloc.add(LoadNextSongEvent("FJRJZCVV74YjGuiG2sLL", widget._songRepository));
+    widget._songBloc.add(LoadNextSongEvent());
   }
+
+
+
+/*
+  void _loadNextSong() {
+    if (_currentIndex < _documentIds.length) {
+      // widget._songBloc.add(LoadNextSongEvent(_documentIds[_currentIndex], widget._songRepository));
+      print("Current Index: $_currentIndex");
+      _currentIndex++;
+    } else {
+      // Reset index or handle end of list
+      _currentIndex = 0;
+    }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -46,16 +63,17 @@ class _SongScreenState extends State<SongScreen> {
         child: BlocBuilder<SongBloc, SongState>(
           bloc: widget._songBloc,
           builder: (context, state) {
-            print('Current state: $state'); // Log the current state
+            print('Current state: $state'); 
 
             if (state is UnSongState) {
               return CircularProgressIndicator();
-            } else if (state is AllSongsLoadedState) {
-              return Text('All songs loaded. Click Next to fetch song details.');
+            }else if (state is LoadingSongState) {
+              return CircularProgressIndicator();
             } else if (state is SongLoadedState) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Text("Current Index: $_currentIndex"),
                   Text('Title: ${state.song.title}'),
                   Text('Album: ${state.song.album}'),
                   Text('Interpreter: ${state.song.interpreter}'),
