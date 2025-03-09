@@ -304,8 +304,10 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           const SizedBox(width: 12),
-                          Image.network(song.thumbnailUrl,
+                          ClipRRect(
+                            child: Image.network(song.thumbnailUrl,
                               width: 50, height: 50, fit: BoxFit.cover),
+                              borderRadius: BorderRadius.circular(5),),
                           const SizedBox(width: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

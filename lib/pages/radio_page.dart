@@ -147,10 +147,24 @@ class _RadioPageState extends State<RadioPage> {
                   onPressed: _backward,
                   iconSize: 48.0,
                 ),
-                IconButton(
-                  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-                  onPressed: () => _playPause(state.song.songUrl),
-                  iconSize: 64.0,
+                Container(
+                // icon button which looks like a play button with a decent shadow 
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(50),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+                    onPressed: () => _playPause(state.song.songUrl),
+                    iconSize: 64.0,
+                  ),
                 ),
                 IconButton(
                   icon: Icon(Icons.fast_forward),
