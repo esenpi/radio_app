@@ -31,6 +31,7 @@ class _RadioPageState extends State<RadioPage> {
   @override
   void initState() {
     super.initState();
+    widget._songBloc.add(LoadSingleSongEvent());
 
     _audioPlayer.onDurationChanged.listen((Duration d) {
       setState(() => _duration = d);

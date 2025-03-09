@@ -19,30 +19,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:radio_app/model/song.dart';
 import 'package:radio_app/pages/login_page.dart';
 import 'package:radio_app/pages/playlist_page.dart';
 import 'package:radio_app/pages/radio_page.dart';
+import 'package:radio_app/song/song_bloc.dart';
+import 'package:radio_app/song/song_event.dart';
+import 'package:radio_app/song/song_state.dart';
 // import 'song/song_page.dart';
 // import 'song/song_screen.dart';
 // import 'song/song_repository.dart';
 // import 'song/song_bloc.dart';
 // import 'song/song_event.dart';
 // import 'song/song_state.dart';
-
-class PlaylistPage extends StatefulWidget {
-  const PlaylistPage({super.key});
-
-  @override
-  State<PlaylistPage> createState() => _PlaylistPageState();
-}
-
-class _PlaylistPageState extends State<PlaylistPage> {
-  @override
-  Widget build(BuildContext context) {
-    return const Text("Playlist Page");
-  }
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -60,13 +49,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: const PlaylistScreen(),
+      home: Text("Playlist"),
     );
   }
 }
 
 class PlaylistScreen extends StatefulWidget {
-  const PlaylistScreen({super.key});
+  final SongBloc _songBloc;
+
+  const PlaylistScreen({
+    Key? key,
+    required SongBloc songBloc,
+  })  : _songBloc = songBloc,
+        super(key: key);
 
   @override
   _PlaylistScreenState createState() => _PlaylistScreenState();
@@ -75,6 +70,20 @@ class PlaylistScreen extends StatefulWidget {
 class _PlaylistScreenState extends State<PlaylistScreen> {
   final TextEditingController _songController = TextEditingController();
   final TextEditingController _artistController = TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    widget._songBloc.add(LoadAllSongsEvent());
+
+  }
+
+  void addSong2(Song song) {
+    widget._songBloc.add(InsertSongEvent(song));
+    _songController.clear();
+    _artistController.clear();
+  }
 
   /// Referenz zur Firestore-Sammlung "songs"
   final CollectionReference songsRef =
@@ -139,7 +148,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: _addSong,
+                  onPressed: () => addSong2(Song(title: _songController.text.trim().isNotEmpty ? "${_songController.text.trim()}" : 'kein Titel eingetragen', interpreter: _artistController.text.trim().isNotEmpty ? "${_artistController.text.trim()}" : "kein Artist eingetragen", album: "playlist album", thumbnailUrl: "https://firebasestorage.googleapis.com/v0/b/sosialmediaapp-da429.appspot.com/o/songs%2F6.jpg?alt=media&token=56161dab-522e-4828-ab8b-708d34a97a16", songUrl: "https://firebasestorage.googleapis.com/v0/b/sosialmediaapp-da429.appspot.com/o/songMP3%2Fsoft-positive-summer-pop-218419.mp3?alt=media&token=f80fd733-fd31-4a91-92c1-fcaa3fa92989")),
                   child: const Text("Song hinzufügen",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -149,6 +158,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
           const Divider(),
 
           /// Echtzeit-Daten aus Firestore abrufen und anzeigen
+          /// 
+          /*
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: songsRef.orderBy("number", descending: false).snapshots(),
@@ -234,6 +245,104 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                     );
                   },
                 );
+              },
+            ),
+          ), */
+
+
+            // migrated form via bloc pattern
+            Expanded(
+            child: BlocBuilder<SongBloc, SongState>(
+              // stream: songsRef.orderBy("number", descending: false).snapshots(),
+              bloc: widget._songBloc,
+              builder: (context, state) {
+                if (state is LoadingSongState) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                /*if (state is noSongs) {
+                  return const Center(
+                      child: Text("Keine Songs in der Playlist"));
+                }*/
+
+                // Firestore-Daten in eine Liste umwandeln
+                // number feld muss eingefügt werden 
+                /*
+                var songs = snapshot.data!.docs.map((doc) {
+                  var data = doc.data() as Map<String, dynamic>;
+                  return {
+                    "number": data["number"],
+                    "title": data["title"],
+                    "artist": data["artist"],
+                    "image": data["image"],
+                    "wished": data["wished"]
+                  };
+                }).toList(); */
+                if (state is SongsLoadedState) {
+                return ListView.builder(
+                  itemCount: state.songs.length,
+                  itemBuilder: (context, index) {
+                    final song = state.songs[index];
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          )
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Text("${index + 1}.",
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 12),
+                          Image.network(song.thumbnailUrl,
+                              width: 50, height: 50, fit: BoxFit.cover),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(song.interpreter,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16)),
+                              Text(song.title,
+                                  style: const TextStyle(
+                                      color: Colors.purple,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14)),
+                            ],
+                          ),
+                          const Spacer(),
+                          /*
+                          if (song["wished"] == true)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.purple.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Text("wished",
+                                  style: TextStyle(
+                                      color: Colors.purple, fontSize: 12)),
+                            ),
+                            */
+                        ],
+                      ),
+                    );
+                  },
+                );}
+                return const Center(
+                      child: Text("Keine Songs in der Playlist"));
               },
             ),
           ),

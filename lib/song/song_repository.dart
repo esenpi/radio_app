@@ -31,4 +31,16 @@ class SongRepository {
       throw Exception("No next document ID found");
     }
   }
+
+  // insert a new song into the Firestore database
+  Future<void> insertSong(Song song) async {
+    await _firestore.collection('songs2').add({
+      'title': song.title,
+      'album': song.album,
+      'interpreter': song.interpreter,
+      'songUrl': song.songUrl,
+      'thumbnailUrl': song.thumbnailUrl,
+    });
+  }
+  
 }

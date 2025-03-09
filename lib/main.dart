@@ -60,11 +60,14 @@ class _MyHomePageState extends State<MyHomePage> {
     _songBloc = SongBloc(_songRepository);
 
     _songBloc.add(LoadAllSongsEvent());
+    //_songBloc.add(LoadSingleSongEvent());
     
     _pages = <Widget>[
-      SongScreen(songBloc: _songBloc),
+      // SongScreen(songBloc: _songBloc),
+      LoginPage(),
       RadioPage(songBloc: _songBloc),
-      const PlaylistPage(),
+      //const PlaylistPage(),
+      PlaylistScreen(songBloc: _songBloc),
     ];
   }
 
@@ -73,6 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
   }
+
+
 
   void _onItemTapped(int index) {
     setState(() {

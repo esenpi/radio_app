@@ -35,8 +35,6 @@ class _SongScreenState extends State<SongScreen> {
     widget._songBloc.add(LoadNextSongEvent());
   }
 
-
-
 /*
   void _loadNextSong() {
     if (_currentIndex < _documentIds.length) {
