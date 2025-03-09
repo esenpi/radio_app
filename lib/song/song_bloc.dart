@@ -14,8 +14,12 @@ class SongBloc extends Bloc<SongEvent, SongState> {
     on<LoadAllSongsEvent>((event, emit) async {
       try {
         emit(LoadingSongState());
-        List<String> documentIDs = await songRepository.fetchAllDocumentIDs();
-        songs = await Future.wait(documentIDs.map((docId) => songRepository.fetchSong(docId)));
+        songs = await songRepository.fetchAllDocumentIDs();
+        // print document IDs
+        print(documentIDs);
+        // songs = await Future.wait(documentIDs.map((docId) => songRepository.fetchSong(docId)));
+        // print songs
+        print("folgendes songs ${songs}");
         if (songs.isNotEmpty) {
           currentIndex = 0;
           print("SongsLoadedState emittiert");
@@ -33,8 +37,7 @@ class SongBloc extends Bloc<SongEvent, SongState> {
     on<LoadSingleSongEvent>((event, emit) async {
       try {
         emit(LoadingSongState());
-        List<String> documentIDs = await songRepository.fetchAllDocumentIDs();
-        songs = await Future.wait(documentIDs.map((docId) => songRepository.fetchSong(docId)));
+        songs = await songRepository.fetchAllDocumentIDs();
         if (songs.isNotEmpty) {
           currentIndex = 0;
           print("SongsLoadedState emittiert");
@@ -85,8 +88,7 @@ class SongBloc extends Bloc<SongEvent, SongState> {
         emit(LoadingSongState());
         await songRepository.insertSong(event.song);
         // refreshs the list of songs with the new inserted one
-        List<String> documentIDs = await songRepository.fetchAllDocumentIDs();
-        songs = await Future.wait(documentIDs.map((docId) => songRepository.fetchSong(docId)));
+        List<Song> songs = await songRepository.fetchAllDocumentIDs();
         emit(SongsLoadedState(songs));
       } catch (error) {
         emit(ErrorSongState(error.toString()));

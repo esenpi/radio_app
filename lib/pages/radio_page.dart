@@ -161,7 +161,10 @@ class _RadioPageState extends State<RadioPage> {
             ),
           ],
         ),
-      );} else 
+      );} else if (state is ErrorSongState) {
+      return Text(state.errorMessage);
+      }
+      else 
     {
       return Text("No song loaded");
     }

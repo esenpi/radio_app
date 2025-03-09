@@ -6,9 +6,16 @@ import 'package:radio_app/model/song.dart';
 class SongRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<String>> fetchAllDocumentIDs() async {
+  Future<List<Song>> fetchAllDocumentIDs() async {
     QuerySnapshot snapshot = await _firestore.collection('songs2').get();
-    return snapshot.docs.map((doc) => doc.id).toList();
+    return snapshot.docs.map((doc) => Song(
+      title: doc['title'],
+      album: doc['album'],
+      interpreter: doc['interpreter'],
+      songUrl: doc['songUrl'],
+      thumbnailUrl: doc['thumbnailUrl'],
+    )).toList();
+    //return snapshot.docs.map((doc) => doc.id).toList();
   }
 
   Future<Song> fetchSong(String docId) async {
@@ -23,7 +30,10 @@ class SongRepository {
   }
 
   Future<String> fetchNextDocumentID(String currentDocId) async {
-    List<String> documentIDs = await fetchAllDocumentIDs();
+    List<String> documentIDs = (await _firestore.collection('songs2').get())
+        .docs
+        .map((doc) => doc.id)
+        .toList();
     int currentIndex = documentIDs.indexOf(currentDocId);
     if (currentIndex != -1 && currentIndex < documentIDs.length - 1) {
       return documentIDs[currentIndex + 1];
