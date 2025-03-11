@@ -13,8 +13,31 @@ class SongBloc extends Bloc<SongEvent, SongState> {
   SongBloc(this.songRepository) : super(UnSongState()) {
     on<LoadAllSongsEvent>((event, emit) async {
       try {
-        List<String> documentIDs = await songRepository.fetchAllDocumentIDs();
-        songs = await Future.wait(documentIDs.map((docId) => songRepository.fetchSong(docId)));
+        emit(LoadingSongState());
+        songs = await songRepository.fetchAllDocumentIDs();
+        // print document IDs
+        print(documentIDs);
+        // songs = await Future.wait(documentIDs.map((docId) => songRepository.fetchSong(docId)));
+        // print songs
+        print("folgendes songs ${songs}");
+        if (songs.isNotEmpty) {
+          currentIndex = 0;
+          print("SongsLoadedState emittiert");
+          // printe mir einen Song aus der Liste
+          print(songs[0].title);
+          emit(SongsLoadedState(songs));
+        } else {
+          emit(UnSongState());
+        } 
+      } catch (error) {
+        emit(ErrorSongState(error.toString()));
+      }
+    });
+
+    on<LoadSingleSongEvent>((event, emit) async {
+      try {
+        emit(LoadingSongState());
+        songs = await songRepository.fetchAllDocumentIDs();
         if (songs.isNotEmpty) {
           currentIndex = 0;
           print("SongsLoadedState emittiert");
@@ -41,6 +64,32 @@ class SongBloc extends Bloc<SongEvent, SongState> {
         }
         print("songtitel des aktuellen Index: ${songs[currentIndex].title}");
         emit(SongLoadedState(songs[currentIndex]));
+      } catch (error) {
+        emit(ErrorSongState(error.toString()));
+      }
+    });
+
+    on<LoadPreviousSongEvent>((event, emit) async {
+      try {
+        emit(LoadingSongState());
+        if (currentIndex > 0) {
+          currentIndex--;
+        } else {
+          currentIndex = songs.length - 1; // Zum letzten Song, wenn der Anfang der Liste erreicht ist
+        }
+        emit(SongLoadedState(songs[currentIndex]));
+      } catch (error) {
+        emit(ErrorSongState(error.toString()));
+      }
+    });
+
+    on<InsertSongEvent>((event, emit) async {
+      try {
+        emit(LoadingSongState());
+        await songRepository.insertSong(event.song);
+        // refreshs the list of songs with the new inserted one
+        List<Song> songs = await songRepository.fetchAllDocumentIDs();
+        emit(SongsLoadedState(songs));
       } catch (error) {
         emit(ErrorSongState(error.toString()));
       }

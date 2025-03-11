@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:radio_app/song/song_bloc.dart';
+import 'package:radio_app/song/song_event.dart';
+import 'package:radio_app/song/song_state.dart';
 
 class RadioPage extends StatefulWidget {
-  const RadioPage({super.key});
+  final SongBloc _songBloc;
+
+  const RadioPage({
+    Key? key,
+    required SongBloc songBloc,
+  })  : _songBloc = songBloc,
+        super(key: key);
+
 
   @override
   State<RadioPage> createState() => _RadioPageState();
@@ -21,6 +31,7 @@ class _RadioPageState extends State<RadioPage> {
   @override
   void initState() {
     super.initState();
+    widget._songBloc.add(LoadSingleSongEvent());
 
     _audioPlayer.onDurationChanged.listen((Duration d) {
       setState(() => _duration = d);
@@ -31,11 +42,11 @@ class _RadioPageState extends State<RadioPage> {
     });
   }
 
-  void _playPause() {
+  void _playPause(String url) {
     if (isPlaying) {
       _audioPlayer.pause();
     } else {
-      _audioPlayer.play('https://example.com/stream'); // Replace with your stream URL
+      _audioPlayer.play(url); 
     }
     setState(() {
       isPlaying = !isPlaying;
@@ -51,11 +62,11 @@ class _RadioPageState extends State<RadioPage> {
   }
 
   void _forward() {
-    // Implement forward functionality if applicable
+    widget._songBloc.add(LoadNextSongEvent());
   }
 
   void _backward() {
-    // Implement backward functionality if applicable
+    widget._songBloc.add(LoadPreviousSongEvent());
   }
 
   @override
@@ -66,23 +77,19 @@ class _RadioPageState extends State<RadioPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Radio Player'),
-      ),
-      body: FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance.collection('test').doc('testDoc').get(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+    return Scaffold( 
+      body: BlocBuilder<SongBloc, SongState>(
+          bloc: widget._songBloc,
+          builder: (context, state) {
+             if (state is UnSongState) {
+              // uninitialised state
               return CircularProgressIndicator();
-            }
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            }
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return Text('Document does not exist');
-            }
-            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+            } else if (state is LoadingSongState) {
+              // loading state
+              return CircularProgressIndicator();
+            } 
+            if (state is SongLoadedState) {
+              // loaded state
             return Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -101,15 +108,17 @@ class _RadioPageState extends State<RadioPage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  "assets/song_cover_1.png",
+                child: Image.network(
+                  "${state.song.thumbnailUrl}",
+                  fit: BoxFit.cover,
                   height: 200,
+                  width: 200,
                 ),
               ),
             ),
             SizedBox(height: 16),
             Text(
-              "${data['song'] } · ${data['interpreter'] } · ${data['album'] }", 
+              "${state.song.title } · ${state.song.interpreter } · ${ state.song.album }", 
               style: TextStyle(fontSize: 17),
             ),
             SizedBox(height: 16),
@@ -138,10 +147,24 @@ class _RadioPageState extends State<RadioPage> {
                   onPressed: _backward,
                   iconSize: 48.0,
                 ),
-                IconButton(
-                  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-                  onPressed: _playPause,
-                  iconSize: 64.0,
+                Container(
+                // icon button which looks like a play button with a decent shadow 
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(50),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+                    onPressed: () => _playPause(state.song.songUrl),
+                    iconSize: 64.0,
+                  ),
                 ),
                 IconButton(
                   icon: Icon(Icons.fast_forward),
@@ -152,7 +175,13 @@ class _RadioPageState extends State<RadioPage> {
             ),
           ],
         ),
-      );
+      );} else if (state is ErrorSongState) {
+      return Text(state.errorMessage);
+      }
+      else 
+    {
+      return Text("No song loaded");
+    }
           },
         ),
     );
