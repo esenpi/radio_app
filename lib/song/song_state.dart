@@ -65,3 +65,5 @@ class ErrorSongState extends SongState {
 }
 
 class LoadingNextSongState extends SongState {}
+
+class SongInsertedState extends SongState {}
