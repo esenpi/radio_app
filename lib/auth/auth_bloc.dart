@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:radio_app/blocs/auth/auth_event.dart';
 import 'package:radio_app/blocs/auth/auth_state.dart';
-import '../../repository/auth_repo.dart';
+import '../repository/auth_repository.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
@@ -43,7 +43,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(UnAuthenticated());
       }
     });
-    */ 
+    */
     // When User Presses the SignOut Button, we will send the SignOutRequested Event to the AuthBloc to handle it and emit the UnAuthenticated State
     on<SignOutRequested>((event, emit) async {
       emit(Loading());

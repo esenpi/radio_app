@@ -2,7 +2,7 @@ import 'package:radio_app/blocs/todo/todo_event.dart';
 import 'package:radio_app/blocs/todo/todo_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../repository/firestore_repo.dart';
+import '../repository/firestore_repository.dart';
 
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final FirestoreService _firestoreService;
@@ -28,10 +28,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       }
     });
 
-    on<UpdateTodo>((event, emit)  async {
+    on<UpdateTodo>((event, emit) async {
       try {
         emit(TodoLoading());
-        await _firestoreService.updateTodo(event.todoId,event.todo);
+        await _firestoreService.updateTodo(event.todoId, event.todo);
         emit(TodoOperationSuccess('Todo updated successfully.'));
       } catch (e) {
         emit(TodoError('Failed to update todo.'));
@@ -47,6 +47,5 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         emit(TodoError('Failed to delete todo.'));
       }
     });
-
   }
 }

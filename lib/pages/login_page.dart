@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:radio_app/auth/auth_bloc.dart';
 import 'package:radio_app/blocs/todo/todo_bloc.dart';
 import 'package:radio_app/pages/homepage.dart';
-import 'package:radio_app/repository/auth_repo.dart';
-import 'package:radio_app/repository/firestore_repo.dart';
+import 'package:radio_app/repository/auth_repository.dart';
+import 'package:radio_app/repository/firestore_repository.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
