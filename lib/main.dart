@@ -13,6 +13,13 @@ import 'song/song_repository.dart';
 import 'song/song_bloc.dart';
 import 'song/song_event.dart';
 import 'song/song_state.dart';
+import 'package:radio_app/blocs/auth/auth_bloc.dart';
+import 'package:radio_app/blocs/todo/todo_bloc.dart';
+import 'package:radio_app/pages/homepage.dart';
+import 'package:radio_app/pages/signin_page.dart';
+import 'package:radio_app/repository/auth_repo.dart';
+import 'package:radio_app/repository/firestore_repo.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,14 +34,38 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return 
+    RepositoryProvider(
+            create: (context) => AuthRepository(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<TodoBloc>(
+            create: (context) => TodoBloc(FirestoreService()),
+          ),
+          BlocProvider(
+              create: (context) => AuthBloc(
+                    authRepository:
+                        RepositoryProvider.of<AuthRepository>(context),
+                  )),
+        ],
+    child: MaterialApp(
       title: 'radio app',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Radio App'),
-    );
+      home: StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                // If the snapshot has user data, then they're already signed in. So Navigating to the Dashboard.
+                if (snapshot.hasData) {
+                  //return const HomePage();
+                  return MyHomePage(title: 'Radio App');
+                }
+                // Otherwise, they're not signed in. Show the sign in page.
+                return const SignIn();
+              }),
+    ),),);
   }
 }
 
@@ -63,9 +94,13 @@ class _MyHomePageState extends State<MyHomePage> {
     // _songBloc.add(LoadNextSongEvent("FJRJZCVV74YjGuiG2sLL", _songRepository));
     
     _pages = <Widget>[
-      SongScreen(songBloc: _songBloc, songRepository: _songRepository),
-      const RadioPage(),
-      const PlaylistPage(),
+      // SongScreen(songBloc: _songBloc),
+      // LoginPage(),
+      // Placeholder(),
+      HomePage(),
+      RadioPage(songBloc: _songBloc),
+      //const PlaylistPage(),
+      PlaylistScreen(songBloc: _songBloc),
     ];
   }
 
@@ -118,5 +153,38 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+    /* 
+    return RepositoryProvider(
+            create: (context) => AuthRepository(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<TodoBloc>(
+            create: (context) => TodoBloc(FirestoreService()),
+          ),
+          BlocProvider(
+              create: (context) => AuthBloc(
+                    authRepository:
+                        RepositoryProvider.of<AuthRepository>(context),
+                  )),
+        ],
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                // If the snapshot has user data, then they're already signed in. So Navigating to the Dashboard.
+                if (snapshot.hasData) {
+                  return const HomePage();
+                }
+                // Otherwise, they're not signed in. Show the sign in page.
+                return const SignIn();
+              }),
+        ),
+      ),
+    ); */
   }
 }
