@@ -60,6 +60,8 @@ dev_dependencies:
   # google_sign_in: ^6.2.1
   email_validator: ^2.1.17
   intl: ^0.20.2
+  flutter_rating_stars: ^1.1.0
+  toastification: 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
