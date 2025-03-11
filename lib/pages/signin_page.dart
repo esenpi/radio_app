@@ -90,10 +90,15 @@ class _SignInState extends State<SignIn> {
                                 TextFormField(
                                   keyboardType: TextInputType.emailAddress,
                                   controller: _emailController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     hintText: "Email",
                                     border: OutlineInputBorder(),
-                                  ),
+                                    suffixIcon: IconButton(
+                                    onPressed: () {
+                                    _emailController.clear();
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                  ),),
                                   autovalidateMode:
                                       AutovalidateMode.onUserInteraction,
                                   validator: (value) {
@@ -109,9 +114,15 @@ class _SignInState extends State<SignIn> {
                                 TextFormField(
                                   keyboardType: TextInputType.text,
                                   controller: _passwordController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     hintText: "Password",
                                     border: OutlineInputBorder(),
+                                    suffixIcon: IconButton(
+                                    onPressed: () {
+                                    _passwordController.clear();
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                ),
                                   ),
                                   autovalidateMode:
                                       AutovalidateMode.onUserInteraction,

@@ -13,6 +13,7 @@ import '../blocs/auth/auth_bloc.dart';
 import '../blocs/auth/auth_event.dart';
 import '../blocs/auth/auth_state.dart';
 import 'signin_page.dart';
+import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -27,6 +28,8 @@ class _HomePageState extends State<HomePage> {
     BlocProvider.of<TodoBloc>(context).add(LoadTodos());
     super.initState();
   }
+
+  double value = 3.5;
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +61,52 @@ class _HomePageState extends State<HomePage> {
         },
         child: BlocBuilder<TodoBloc, TodoState>(
           builder: (context, state) {
+            print('Current state: $state');
+
             if (state is TodoLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is TodoLoaded) {
               final todos = state.todos;
+              return Column(
+                children: [
+                  Container(
+                    child: RatingStars(
+                      value: value,
+                      onValueChanged: (v) {
+                        //
+                        print("Rating: $v");
+                        setState(() {
+                          value = v;
+                        });
+                      },
+                      starBuilder: (index, color) => Icon(
+                        Icons.star,
+                        color: color,
+                      ),
+                      starCount: 5,
+                      starSize: 50,
+                      valueLabelColor: const Color(0xff9b9b9b),
+                      valueLabelTextStyle: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                          fontSize: 12.0),
+                      valueLabelRadius: 10,
+                      maxValue: 5,
+                      starSpacing: 2,
+                      maxValueVisibility: true,
+                      valueLabelVisibility: true,
+                      animationDuration: Duration(milliseconds: 1000),
+                      valueLabelPadding: const EdgeInsets.symmetric(
+                          vertical: 1, horizontal: 8),
+                      valueLabelMargin: const EdgeInsets.only(right: 8),
+                      starOffColor: const Color(0xffe7e8ea),
+                      starColor: Colors.yellow,
+                    ),
+                  ),
+                ],
+              );
+              /*
               return Container(
                    color: Colors.grey[200],
                 child: ListView.builder(
@@ -154,8 +199,9 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                 ),
-              );
+              );*/
             } else if (state is TodoOperationSuccess) {
+              print("Success ${state.message}");
               _todoBloc.add(LoadTodos()); // Reload todos
               return Container(); // Or display a success message
             } else if (state is TodoError) {
@@ -171,7 +217,10 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           _showAddTodoDialog(context, false, null);
         },
-        child: const Icon(Icons.add,color: Colors.white,),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }
