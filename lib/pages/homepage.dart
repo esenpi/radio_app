@@ -1,6 +1,9 @@
+import 'package:radio_app/blocs/moderator_rating/moderator_rating_bloc.dart';
+import 'package:radio_app/blocs/moderator_rating/moderator_rating_event.dart';
 import 'package:radio_app/blocs/todo/todo_bloc.dart';
 import 'package:radio_app/blocs/todo/todo_event.dart';
 import 'package:radio_app/blocs/todo/todo_state.dart';
+import 'package:radio_app/model/moderator_rating.dart';
 import 'package:radio_app/model/todo.dart';
 import 'package:radio_app/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,6 +17,7 @@ import '../blocs/auth/auth_event.dart';
 import '../blocs/auth/auth_state.dart';
 import 'signin_page.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -29,15 +33,17 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  double value = 3.5;
+  double moderatorValue = 1.5;
+  double playlistValue = 1.5;
 
   @override
   Widget build(BuildContext context) {
     final TodoBloc _todoBloc = BlocProvider.of<TodoBloc>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'ToDo',
+          'PlayList / Moderator bewerten',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: AppColors.appColor,
@@ -59,157 +65,163 @@ class _HomePageState extends State<HomePage> {
             );
           }
         },
-        child: BlocBuilder<TodoBloc, TodoState>(
-          builder: (context, state) {
-            print('Current state: $state');
+        child:
+            /*
+            RatingStars(
+              value: value,
+              onValueChanged: (v) {
+                //
+                print("Rating: $v");
+                setState(() {
+                  value = v;
+                });
+                // datetime to firebase timestamp
+                ModeratorRating rating = ModeratorRating(
+                    rating: v.toInt(),
+                    date: Timestamp.fromDate(DateTime.now()),
+                    shown: false);
+                BlocProvider.of<ModeratorRatingBloc>(context)
+                    .add(InsertModeratorRatingEvent(rating));
+              },
+              starBuilder: (index, color) => Icon(
+                Icons.star,
+                color: color,
+              ),
+              starCount: 5,
+              starSize: 50,
+              valueLabelColor: const Color(0xff9b9b9b),
+              valueLabelTextStyle: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 12.0),
+              valueLabelRadius: 10,
+              maxValue: 5,
+              starSpacing: 2,
+              maxValueVisibility: true,
+              valueLabelVisibility: true,
+              animationDuration: Duration(milliseconds: 1000),
+              valueLabelPadding:
+                  const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+              valueLabelMargin: const EdgeInsets.only(right: 8),
+              starOffColor: const Color(0xffe7e8ea),
+              starColor: Colors.yellow,
+            ),  */
+            Container(
+          child: BlocBuilder<TodoBloc, TodoState>(
+            builder: (context, state) {
+              print('Current state: $state');
 
-            if (state is TodoLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is TodoLoaded) {
-              final todos = state.todos;
-              return Column(
-                children: [
-                  Container(
-                    child: RatingStars(
-                      value: value,
-                      onValueChanged: (v) {
-                        //
-                        print("Rating: $v");
-                        setState(() {
-                          value = v;
-                        });
-                      },
-                      starBuilder: (index, color) => Icon(
-                        Icons.star,
-                        color: color,
-                      ),
-                      starCount: 5,
-                      starSize: 50,
-                      valueLabelColor: const Color(0xff9b9b9b),
-                      valueLabelTextStyle: const TextStyle(
+              if (state is TodoLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is TodoLoaded) {
+                final todos = state.todos;
+                return Container(
+                  color: Colors.grey[200],
+                  child: ListView.builder(
+                    itemCount: todos.length,
+                    itemBuilder: (context, index) {
+                      final todo = todos[index];
+                      return Container(
+                        margin: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15.0),
                           color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 12.0),
-                      valueLabelRadius: 10,
-                      maxValue: 5,
-                      starSpacing: 2,
-                      maxValueVisibility: true,
-                      valueLabelVisibility: true,
-                      animationDuration: Duration(milliseconds: 1000),
-                      valueLabelPadding: const EdgeInsets.symmetric(
-                          vertical: 1, horizontal: 8),
-                      valueLabelMargin: const EdgeInsets.only(right: 8),
-                      starOffColor: const Color(0xffe7e8ea),
-                      starColor: Colors.yellow,
-                    ),
-                  ),
-                ],
-              );
-              /*
-              return Container(
-                   color: Colors.grey[200],
-                child: ListView.builder(
-                  itemCount: todos.length,
-                
-                  itemBuilder: (context, index) {
-                    final todo = todos[index];
-                    return Container(
-                      margin: const EdgeInsets.all(8),
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        color: Colors.white,
-                        boxShadow: const [
-                          BoxShadow(
-                            color: AppColors.shadowColor,
-                            blurRadius: 5.0,
-                            offset:
-                                Offset(0, 5), // shadow direction: bottom right
-                          ),
-                        ],
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          todo.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: AppColors.appColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Text(todo.description),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4.0),
-                                  alignment: Alignment.center,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.red[900],
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  todo.date,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[700],
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ],
+                          boxShadow: const [
+                            BoxShadow(
+                              color: AppColors.shadowColor,
+                              blurRadius: 5.0,
+                              offset: Offset(
+                                  0, 5), // shadow direction: bottom right
                             ),
                           ],
                         ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                _showAddTodoDialog(context, true, todo);
-                              },
+                        child: ListTile(
+                          title: Text(
+                            "Bewertung",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: AppColors.appColor,
+                              fontWeight: FontWeight.w500,
                             ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.red.withOpacity(0.5),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(
+                                height: 8,
                               ),
-                              onPressed: () {
-                                _todoBloc.add(DeleteTodo(todo.id!));
-                              },
-                            ),
-                          ],
+                              Text(
+                                  "Moderator ${todo.moderatorRating} / Playlist ${todo.playlistRating}"),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
+                                    alignment: Alignment.center,
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.purple[900],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    todo.date,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  _showAddTodoDialog(context, true, todo);
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.red.withOpacity(0.5),
+                                ),
+                                onPressed: () {
+                                  _todoBloc.add(DeleteTodo(todo.id!));
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              );*/
-            } else if (state is TodoOperationSuccess) {
-              print("Success ${state.message}");
-              _todoBloc.add(LoadTodos()); // Reload todos
-              return Container(); // Or display a success message
-            } else if (state is TodoError) {
-              return Center(child: Text(state.errorMessage));
-            } else {
-              return Container();
-            }
-          },
+                      );
+                    },
+                  ),
+                );
+              } else if (state is TodoOperationSuccess) {
+                print("Success ${state.message}");
+                _todoBloc.add(LoadTodos()); // Reload todos
+                return Container(); // Or display a success message
+              } else if (state is TodoError) {
+                // print long error message with stacktrace
+                print("Error: ${state.errorMessage}");
+                return Center(child: Text(state.errorMessage));
+              } else {
+                return Container();
+              }
+            },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -218,7 +230,7 @@ class _HomePageState extends State<HomePage> {
           _showAddTodoDialog(context, false, null);
         },
         child: const Icon(
-          Icons.add,
+          Icons.star,
           color: Colors.white,
         ),
       ),
@@ -229,6 +241,7 @@ class _HomePageState extends State<HomePage> {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
     final dateController = TextEditingController();
+
     if (isEdit) {
       titleController.text = todos!.title;
       descriptionController.text = todos.description;
@@ -238,12 +251,13 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(isEdit ? 'Edit Todo' : 'Add Todo'),
+          title: Text(isEdit ? 'Bewertung ändern' : 'Bewertung hinfügen'),
           content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.5,
+            width: MediaQuery.of(context).size.width * 0.98,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                /*
                 TextField(
                   controller: titleController,
                   style: const TextStyle(fontSize: 14),
@@ -260,9 +274,77 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                ),
+                ),*/
                 const SizedBox(height: 15),
-                TextFormField(
+                Text("Moderator bewerten"),
+                RatingStars(
+                  value: moderatorValue,
+                  onValueChanged: (v) {
+                    //
+                    print("Rating: $v");
+                    setState(() {
+                      moderatorValue = v;
+                    });
+                  },
+                  starBuilder: (index, color) => Icon(
+                    Icons.star,
+                    color: color,
+                  ),
+                  starCount: 5,
+                  starSize: 30,
+                  valueLabelColor: const Color(0xff9b9b9b),
+                  valueLabelTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.normal,
+                      fontSize: 12.0),
+                  valueLabelRadius: 10,
+                  maxValue: 5,
+                  starSpacing: 1,
+                  maxValueVisibility: true,
+                  valueLabelVisibility: true,
+                  animationDuration: Duration(milliseconds: 1000),
+                  valueLabelPadding:
+                      const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+                  valueLabelMargin: const EdgeInsets.only(right: 8),
+                  starOffColor: const Color(0xffe7e8ea),
+                  starColor: Colors.yellow,
+                ),
+                Text("Playlist bewerten"),
+                RatingStars(
+                  value: playlistValue,
+                  onValueChanged: (v) {
+                    //
+                    print("Rating: $v");
+                    setState(() {
+                      playlistValue = v;
+                    });
+                  },
+                  starBuilder: (index, color) => Icon(
+                    Icons.star,
+                    color: color,
+                  ),
+                  starCount: 5,
+                  starSize: 30,
+                  valueLabelColor: const Color(0xff9b9b9b),
+                  valueLabelTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.normal,
+                      fontSize: 12.0),
+                  valueLabelRadius: 10,
+                  maxValue: 5,
+                  starSpacing: 1,
+                  maxValueVisibility: true,
+                  valueLabelVisibility: true,
+                  animationDuration: Duration(milliseconds: 1000),
+                  valueLabelPadding:
+                      const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+                  valueLabelMargin: const EdgeInsets.only(right: 8),
+                  starOffColor: const Color(0xffe7e8ea),
+                  starColor: Colors.yellow,
+                ),
+                /*TextFormField(
                   controller: descriptionController,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
@@ -280,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                ),
+                ),*/
                 const SizedBox(height: 15),
                 TextField(
                   controller:
@@ -330,26 +412,35 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: [
             ElevatedButton(
-              child: const Text('Cancel'),
+              child: const Text('Abbrechen'),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
             ElevatedButton(
-              child: Text(isEdit ? 'Update' : 'Add'),
+              child: Text(isEdit ? 'Ändern' : 'Ok'),
               onPressed: () {
                 final todo = isEdit
                     ? Todo(
                         id: todos!.id!,
                         title: titleController.text,
                         description: descriptionController.text,
-                        date: dateController.text,
+                        moderatorRating: moderatorValue ?? 0.0,
+                        playlistRating: playlistValue ?? 0.0,
+                        // if date is empty then use current date
+                        date: dateController.text.isEmpty
+                            ? DateFormat('yyyy-MM-dd').format(DateTime.now())
+                            : dateController.text,
                         completed: titleController.text.isEmpty)
                     : Todo(
                         id: DateTime.now().toString(),
                         title: titleController.text,
                         description: descriptionController.text,
-                        date: dateController.text,
+                        moderatorRating: moderatorValue ?? 0.0,
+                        playlistRating: playlistValue ?? 0.0,
+                        date: dateController.text.isEmpty
+                            ? DateFormat('yyyy-MM-dd').format(DateTime.now())
+                            : dateController.text,
                         completed: false,
                       );
                 if (isEdit) {

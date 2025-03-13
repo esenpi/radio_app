@@ -45,5 +45,3 @@ class LoadingSongState extends SongState {
   @override
   String toString() => 'LoadingSongState';
 }
-
-

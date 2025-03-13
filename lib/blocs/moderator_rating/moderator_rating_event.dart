@@ -3,33 +3,33 @@ import 'dart:developer' as developer;
 
 import 'package:radio_app/blocs/moderator_rating/index.dart';
 import 'package:meta/meta.dart';
+import 'package:radio_app/model/moderator_rating.dart';
+@immutable
+import 'package:equatable/equatable.dart';
 
 @immutable
-abstract class ModeratorRatingEvent {
-  Stream<ModeratorRatingState> applyAsync(
-      {ModeratorRatingState currentState, ModeratorRatingBloc bloc});
-}
+abstract class ModeratorRatingEvent extends Equatable {
+  const ModeratorRatingEvent();
 
-class UnModeratorRatingEvent extends ModeratorRatingEvent {
   @override
-  Stream<ModeratorRatingState> applyAsync(
-      {ModeratorRatingState? currentState, ModeratorRatingBloc? bloc}) async* {
-    yield UnModeratorRatingState();
-  }
+  List<Object> get props => [];
 }
 
 class LoadModeratorRatingEvent extends ModeratorRatingEvent {
   @override
-  Stream<ModeratorRatingState> applyAsync(
-      {ModeratorRatingState? currentState, ModeratorRatingBloc? bloc}) async* {
-    try {
-      yield UnModeratorRatingState();
-      await Future.delayed(const Duration(seconds: 1));
-      yield InModeratorRatingState('Hello world');
-    } catch (_, stackTrace) {
-      developer.log('$_',
-          name: 'LoadModeratorRatingEvent', error: _, stackTrace: stackTrace);
-      yield ErrorModeratorRatingState(_.toString());
-    }
-  }
+  const LoadModeratorRatingEvent();
+}
+
+class InsertModeratorRatingEvent extends ModeratorRatingEvent {
+  final ModeratorRating moderatorRating;
+  const InsertModeratorRatingEvent(this.moderatorRating);
+
+  @override
+  List<Object> get props => [moderatorRating];
+}
+
+class LoadingModeratorRatingState extends ModeratorRatingState {
+  LoadingModeratorRatingState();
+  @override
+  String toString() => 'loadingModeratorRatingState';
 }

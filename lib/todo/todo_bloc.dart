@@ -3,7 +3,7 @@ import 'package:radio_app/blocs/todo/todo_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../repository/firestore_repository.dart';
-
+/* 
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final FirestoreService _firestoreService;
 
@@ -49,3 +49,4 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     });
   }
 }
+*/

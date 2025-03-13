@@ -12,8 +12,12 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       try {
         emit(TodoLoading());
         final todos = await _firestoreService.getTodos().first;
+        print("todos im todo_bloc.dart");
+        print(todos);
         emit(TodoLoaded(todos));
-      } catch (e) {
+      } catch (e, stackTrace) {
+        print("Error loading todods: $e");
+        print(stackTrace);
         emit(TodoError('Failed to load todos.'));
       }
     });
