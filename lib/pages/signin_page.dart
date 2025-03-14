@@ -1,4 +1,3 @@
-
 import 'package:email_validator/email_validator.dart';
 import 'package:radio_app/main.dart';
 import 'package:radio_app/pages/homepage.dart';
@@ -40,17 +39,18 @@ class _SignInState extends State<SignIn> {
           if (state is Authenticated) {
             // Navigating to the dashboard screen if the user is authenticated
             print("Der User ist authentifiziert");
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => MyApp()));
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => MyApp()));
           }
           if (state is AuthError) {
             // Showing the error message if the user has entered invalid credentials
             print("Der User ist nicht authentifiziert");
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
-          } if (state is UnAuthenticated) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text("User nicht authentifiziert")));
+          }
+          if (state is UnAuthenticated) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("User nicht authentifiziert")));
             print("Der User ist nicht authentifiziert");
           }
         },
@@ -73,7 +73,7 @@ class _SignInState extends State<SignIn> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          "Sign In",
+                          "Moderator Login",
                           style: TextStyle(
                             fontSize: 38,
                             fontWeight: FontWeight.bold,
@@ -94,17 +94,18 @@ class _SignInState extends State<SignIn> {
                                     hintText: "Email",
                                     border: OutlineInputBorder(),
                                     suffixIcon: IconButton(
-                                    onPressed: () {
-                                    _emailController.clear();
-                                  },
-                                  icon: const Icon(Icons.clear),
-                                  ),),
+                                      onPressed: () {
+                                        _emailController.clear();
+                                      },
+                                      icon: const Icon(Icons.clear),
+                                    ),
+                                  ),
                                   autovalidateMode:
                                       AutovalidateMode.onUserInteraction,
                                   validator: (value) {
                                     return value != null &&
                                             !EmailValidator.validate(value)
-                                        ? 'Enter a valid email'
+                                        ? 'Gültige E-Mail eingeben'
                                         : null;
                                   },
                                 ),
@@ -115,20 +116,20 @@ class _SignInState extends State<SignIn> {
                                   keyboardType: TextInputType.text,
                                   controller: _passwordController,
                                   decoration: InputDecoration(
-                                    hintText: "Password",
+                                    hintText: "Passwort",
                                     border: OutlineInputBorder(),
                                     suffixIcon: IconButton(
-                                    onPressed: () {
-                                    _passwordController.clear();
-                                  },
-                                  icon: const Icon(Icons.clear),
-                                ),
+                                      onPressed: () {
+                                        _passwordController.clear();
+                                      },
+                                      icon: const Icon(Icons.clear),
+                                    ),
                                   ),
                                   autovalidateMode:
                                       AutovalidateMode.onUserInteraction,
                                   validator: (value) {
                                     return value != null && value.length < 6
-                                        ? "Enter min. 6 characters"
+                                        ? "Min. 6 Zeichen"
                                         : null;
                                   },
                                 ),
@@ -143,16 +144,17 @@ class _SignInState extends State<SignIn> {
                                       _authenticateWithEmailAndPassword(
                                           context);
                                     },
-                                    child: const Text('Sign In'),
+                                    child: const Text('Login'),
                                   ),
                                 )
                               ],
                             ),
                           ),
                         ),
-                        
-                      const SizedBox(height: 10,),
-                       /* InkWell(
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        /* InkWell(
                            onTap: () {
                             _authenticateWithGoogle(context);
                           },
@@ -171,10 +173,13 @@ class _SignInState extends State<SignIn> {
                             ]),
                           ),),
                         ), */
-                      const SizedBox(height: 10,),
-                        const Text("Don't have an account?"),
-                        
-                      const SizedBox(height: 10,),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text("Du hast noch kein Moderator-Konto?"),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         OutlinedButton(
                           onPressed: () {
                             Navigator.pushReplacement(
@@ -183,8 +188,17 @@ class _SignInState extends State<SignIn> {
                                   builder: (context) => const SignUp()),
                             );
                           },
-                          child: const Text("Sign Up"),
-                        )
+                          child: const Text("Registrieren"),
+                        ),
+                        OutlinedButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => MyApp()),
+                            );
+                          },
+                          child: const Text("Als Zuhörer"),
+                        ),
                       ],
                     ),
                   ),

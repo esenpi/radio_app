@@ -74,9 +74,9 @@ class _SignUpState extends State<SignUp> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Text(
-                              "Sign Up",
+                              "Moderator Registrierung",
                               style: TextStyle(
-                                fontSize: 38,
+                                fontSize: 25,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -94,18 +94,18 @@ class _SignUpState extends State<SignUp> {
                                         hintText: "Email",
                                         border: OutlineInputBorder(),
                                         suffixIcon: IconButton(
-                                        onPressed: () {
-                                    _emailController.clear();
-                                  },
-                                  icon: const Icon(Icons.clear),
-                                ),
+                                          onPressed: () {
+                                            _emailController.clear();
+                                          },
+                                          icon: const Icon(Icons.clear),
+                                        ),
                                       ),
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,
                                       validator: (value) {
                                         return value != null &&
                                                 !EmailValidator.validate(value)
-                                            ? 'Enter a valid email'
+                                            ? 'Gültige E-Mail eingeben'
                                             : null;
                                       },
                                     ),
@@ -115,20 +115,20 @@ class _SignUpState extends State<SignUp> {
                                     TextFormField(
                                       controller: _passwordController,
                                       decoration: InputDecoration(
-                                        hintText: "Password",
+                                        hintText: "Passwort",
                                         border: OutlineInputBorder(),
                                         suffixIcon: IconButton(
-                                  onPressed: () {
-                                    _passwordController.clear();
-                                  },
-                                  icon: const Icon(Icons.clear),
-                                ),
+                                          onPressed: () {
+                                            _passwordController.clear();
+                                          },
+                                          icon: const Icon(Icons.clear),
+                                        ),
                                       ),
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,
                                       validator: (value) {
                                         return value != null && value.length < 6
-                                            ? "Enter min. 6 characters"
+                                            ? "Min. 6 Zeichen"
                                             : null;
                                       },
                                     ),
@@ -143,14 +143,14 @@ class _SignUpState extends State<SignUp> {
                                           _createAccountWithEmailAndPassword(
                                               context);
                                         },
-                                        child: const Text('Sign Up'),
+                                        child: const Text('Registrieren'),
                                       ),
                                     )
                                   ],
                                 ),
                               ),
                             ),
-                            const Text("Already have an account?"),
+                            const Text("Du hast bereits einen Account?"),
                             OutlinedButton(
                               onPressed: () {
                                 Navigator.pushReplacement(
@@ -159,9 +159,19 @@ class _SignUpState extends State<SignUp> {
                                       builder: (context) => const SignIn()),
                                 );
                               },
-                              child: const Text("Sign In"),
+                              child: const Text("Login"),
                             ),
-                            const Text("Or"),
+                            const Text("Oder"),
+                            OutlinedButton(
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyApp()),
+                                );
+                              },
+                              child: const Text("Als Zuhörer"),
+                            ),
                             /* 
                             InkWell(
                               onTap: () {

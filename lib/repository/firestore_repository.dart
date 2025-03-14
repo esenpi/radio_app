@@ -13,7 +13,7 @@ class FirestoreService {
 
   Stream<List<Todo>> getTodos() {
     return _todosCollection
-        .doc(currentUserId)
+        .doc('ratings')
         .collection('user_todos')
         .snapshots()
         .map((snapshot) {
@@ -34,7 +34,8 @@ class FirestoreService {
   }
 
   Future<void> addTodo(Todo todo) {
-    return _todosCollection.doc(currentUserId).collection('user_todos').add({
+    // currentUser has been replaced with a standard collection called ratings
+    return _todosCollection.doc('ratings').collection('user_todos').add({
       'title': todo.title,
       'description': todo.description,
       'moderatorRating': todo.moderatorRating,
@@ -46,7 +47,7 @@ class FirestoreService {
 
   Future<void> updateTodo(String todoId, Todo todo) {
     return _todosCollection
-        .doc(currentUserId)
+        .doc('ratings')
         .collection('user_todos')
         .doc(todoId)
         .update({
@@ -61,7 +62,7 @@ class FirestoreService {
 
   Future<void> deleteTodo(String todoId) {
     return _todosCollection
-        .doc(currentUserId)
+        .doc('ratings')
         .collection('user_todos')
         .doc(todoId)
         .delete();
