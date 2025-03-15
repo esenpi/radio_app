@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:radio_app/blocs/moderator_rating/moderator_rating_event.dart';
-import 'package:radio_app/blocs/moderator_rating/moderator_rating_state.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/moderator_rating_event.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/moderator_rating_state.dart';
 import 'package:radio_app/model/moderator_rating.dart';
 
 class ModeratorRatingRepository {

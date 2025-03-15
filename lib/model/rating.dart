@@ -1,4 +1,4 @@
-class Todo {
+class Rating {
   String? id;
   String title;
   String description;
@@ -7,7 +7,7 @@ class Todo {
   String date;
   bool completed;
 
-  Todo({
+  Rating({
     required this.id,
     required this.title,
     required this.description,
@@ -17,7 +17,7 @@ class Todo {
     required this.completed,
   });
 
-  Todo copyWith({
+  Rating copyWith({
     String? id,
     String? title,
     String? description,
@@ -26,7 +26,7 @@ class Todo {
     String? date,
     bool? completed,
   }) {
-    return Todo(
+    return Rating(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,

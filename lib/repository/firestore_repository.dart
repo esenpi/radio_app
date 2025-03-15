@@ -1,26 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:radio_app/model/moderator_rating.dart';
-import 'package:radio_app/model/todo.dart';
+import 'package:radio_app/model/rating.dart';
 
 class FirestoreService {
-  final CollectionReference _todosCollection = FirebaseFirestore.instance
-      .collection('todos'); // Use a fixed collection name
+  final CollectionReference _ratingsCollection = FirebaseFirestore.instance
+      .collection('ratings'); // Use a fixed collection name
   // final CollectionReference _moderatorRatingCollection = FirebaseFirestore.instance.collection('moderator_rating');
 
   String get currentUserId =>
       FirebaseAuth.instance.currentUser?.uid ?? 'default';
 
-  Stream<List<Todo>> getTodos() {
-    return _todosCollection
+  Stream<List<Rating>> getRatings() {
+    return _ratingsCollection
         .doc('ratings')
-        .collection('user_todos')
+        .collection('user_ratings')
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
-        print("getTodos data:  ${data}");
-        return Todo(
+        print("getRatings data:  ${data}");
+        return Rating(
           id: doc.id,
           title: data['title'] ?? 'kein Titel',
           description: data['description'] ?? 'keine Beschreibung',
@@ -33,38 +33,38 @@ class FirestoreService {
     });
   }
 
-  Future<void> addTodo(Todo todo) {
+  Future<void> addRating(Rating rating) {
     // currentUser has been replaced with a standard collection called ratings
-    return _todosCollection.doc('ratings').collection('user_todos').add({
-      'title': todo.title,
-      'description': todo.description,
-      'moderatorRating': todo.moderatorRating,
-      'playlistRating': todo.playlistRating,
-      'date': todo.date,
-      'completed': todo.completed,
+    return _ratingsCollection.doc('ratings').collection('user_ratings').add({
+      'title': rating.title,
+      'description': rating.description,
+      'moderatorRating': rating.moderatorRating,
+      'playlistRating': rating.playlistRating,
+      'date': rating.date,
+      'completed': rating.completed,
     });
   }
 
-  Future<void> updateTodo(String todoId, Todo todo) {
-    return _todosCollection
+  Future<void> updateRating(String ratingId, Rating rating) {
+    return _ratingsCollection
         .doc('ratings')
-        .collection('user_todos')
-        .doc(todoId)
+        .collection('user_ratings')
+        .doc(ratingId)
         .update({
-      'title': todo.title,
-      'description': todo.description,
-      'moderatorRating': todo.moderatorRating,
-      'playlistRating': todo.playlistRating,
-      'date': todo.date,
-      'completed': todo.completed,
+      'title': rating.title,
+      'description': rating.description,
+      'moderatorRating': rating.moderatorRating,
+      'playlistRating': rating.playlistRating,
+      'date': rating.date,
+      'completed': rating.completed,
     });
   }
 
-  Future<void> deleteTodo(String todoId) {
-    return _todosCollection
+  Future<void> deleteRating(String ratingId) {
+    return _ratingsCollection
         .doc('ratings')
-        .collection('user_todos')
-        .doc(todoId)
+        .collection('user_ratings')
+        .doc(ratingId)
         .delete();
   }
 

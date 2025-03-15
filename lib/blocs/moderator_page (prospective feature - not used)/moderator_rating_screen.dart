@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:radio_app/blocs/moderator_rating/index.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/index.dart';
 
 class ModeratorRatingScreen extends StatefulWidget {
   const ModeratorRatingScreen({

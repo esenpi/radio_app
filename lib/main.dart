@@ -8,7 +8,7 @@ import 'song/song_repository.dart';
 import 'song/song_bloc.dart';
 import 'song/song_event.dart';
 import 'package:radio_app/blocs/auth/auth_bloc.dart';
-import 'package:radio_app/blocs/todo/todo_bloc.dart';
+import 'package:radio_app/blocs/rating/rating_bloc.dart';
 import 'package:radio_app/pages/homepage.dart';
 import 'package:radio_app/pages/signin_page.dart';
 import 'package:radio_app/repository/auth_repository.dart';
@@ -32,8 +32,8 @@ class MyApp extends StatelessWidget {
       create: (context) => AuthRepository(),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<TodoBloc>(
-            create: (context) => TodoBloc(FirestoreService()),
+          BlocProvider<RatingBloc>(
+            create: (context) => RatingBloc(FirestoreService()),
           ),
           BlocProvider(
               create: (context) => AuthBloc(
@@ -52,11 +52,11 @@ class MyApp extends StatelessWidget {
               builder: (context, snapshot) {
                 // If the snapshot has user data, then they're already signed in. So Navigating to the Dashboard.
                 if (snapshot.hasData) {
-                  //return const HomePage();
-                  return MyHomePage(title: 'Radio App');
+                  // If the moderator is signed in show the moderator page.
+                  return MyHomePage(title: '(Moderator) Radio App');
                 }
-                // Otherwise, they're not signed in. Show the sign in page.
-                return const SignIn();
+                // Otherwise, they're not signed in. Show the audience page.
+                return MyHomePage(title: 'Als Zuhörer angemeldet');
               }),
         ),
       ),
@@ -86,23 +86,12 @@ class _MyHomePageState extends State<MyHomePage> {
     _songBloc = SongBloc(_songRepository);
 
     _songBloc.add(LoadAllSongsEvent());
-    //_songBloc.add(LoadSingleSongEvent());
 
     _pages = <Widget>[
-      // SongScreen(songBloc: _songBloc),
-      // LoginPage(),
-      // Placeholder(),
       HomePage(),
       RadioPage(songBloc: _songBloc),
-      //const PlaylistPage(),
       PlaylistScreen(songBloc: _songBloc),
     ];
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
   }
 
   void _onItemTapped(int index) {
@@ -122,16 +111,11 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Center(
           child: _pages.elementAt(_selectedIndex),
         ),
-        /* floatingActionButton: FloatingActionButton(
-          onPressed: _incrementCounter,
-          tooltip: 'Increment',
-          child: const Icon(Icons.add),
-        ),*/
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.login),
-              label: 'Login',
+              icon: Icon(Icons.rate_review),
+              label: 'Bewertung',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.radar_outlined),
@@ -148,38 +132,5 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-    /* 
-    return RepositoryProvider(
-            create: (context) => AuthRepository(),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<TodoBloc>(
-            create: (context) => TodoBloc(FirestoreService()),
-          ),
-          BlocProvider(
-              create: (context) => AuthBloc(
-                    authRepository:
-                        RepositoryProvider.of<AuthRepository>(context),
-                  )),
-        ],
-        child: MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
-          home: StreamBuilder<User?>(
-              stream: FirebaseAuth.instance.authStateChanges(),
-              builder: (context, snapshot) {
-                // If the snapshot has user data, then they're already signed in. So Navigating to the Dashboard.
-                if (snapshot.hasData) {
-                  return const HomePage();
-                }
-                // Otherwise, they're not signed in. Show the sign in page.
-                return const SignIn();
-              }),
-        ),
-      ),
-    ); */
   }
 }

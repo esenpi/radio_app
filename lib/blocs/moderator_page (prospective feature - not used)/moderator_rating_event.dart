@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
-import 'package:radio_app/blocs/moderator_rating/index.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/index.dart';
 import 'package:meta/meta.dart';
 import 'package:radio_app/model/moderator_rating.dart';
 @immutable

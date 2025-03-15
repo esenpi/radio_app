@@ -1,16 +1,16 @@
-import 'package:radio_app/blocs/moderator_rating/moderator_rating_bloc.dart';
-import 'package:radio_app/blocs/moderator_rating/moderator_rating_event.dart';
-import 'package:radio_app/blocs/todo/todo_bloc.dart';
-import 'package:radio_app/blocs/todo/todo_event.dart';
-import 'package:radio_app/blocs/todo/todo_state.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/moderator_rating_bloc.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/moderator_rating_event.dart';
+import 'package:radio_app/blocs/rating/rating_bloc.dart';
+import 'package:radio_app/blocs/rating/rating_event.dart';
+import 'package:radio_app/blocs/rating/rating_state.dart';
 import 'package:radio_app/model/moderator_rating.dart';
-import 'package:radio_app/model/todo.dart';
+import 'package:radio_app/model/rating.dart';
 import 'package:radio_app/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:radio_app/blocs/todo/todo_bloc.dart';
+import 'package:radio_app/blocs/rating/rating_bloc.dart';
 
 import '../blocs/auth/auth_bloc.dart';
 import '../blocs/auth/auth_event.dart';
@@ -29,7 +29,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    BlocProvider.of<TodoBloc>(context).add(LoadTodos());
+    BlocProvider.of<RatingBloc>(context).add(LoadRatings());
     super.initState();
   }
 
@@ -38,12 +38,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final TodoBloc _todoBloc = BlocProvider.of<TodoBloc>(context);
+    final RatingBloc _ratingBloc = BlocProvider.of<RatingBloc>(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'PlayList / Moderator bewerten',
+          'Bewertungen',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: AppColors.appColor,
@@ -108,20 +108,20 @@ class _HomePageState extends State<HomePage> {
               starColor: Colors.yellow,
             ),  */
             Container(
-          child: BlocBuilder<TodoBloc, TodoState>(
+          child: BlocBuilder<RatingBloc, RatingState>(
             builder: (context, state) {
               print('Current state: $state');
 
-              if (state is TodoLoading) {
+              if (state is RatingLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is TodoLoaded) {
-                final todos = state.todos;
+              } else if (state is RatingLoaded) {
+                final ratings = state.ratings;
                 return Container(
                   color: Colors.grey[200],
                   child: ListView.builder(
-                    itemCount: todos.length,
+                    itemCount: ratings.length,
                     itemBuilder: (context, index) {
-                      final todo = todos[index];
+                      final rating = ratings[index];
                       return Container(
                         margin: const EdgeInsets.all(8),
                         padding: const EdgeInsets.all(8),
@@ -153,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                                 height: 8,
                               ),
                               Text(
-                                  "Moderator ${todo.moderatorRating} / Playlist ${todo.playlistRating}"),
+                                  "Moderator ${rating.moderatorRating} / Playlist ${rating.playlistRating}"),
                               const SizedBox(
                                 height: 8,
                               ),
@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
-                                    todo.date,
+                                    rating.date,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey[700],
@@ -190,7 +190,7 @@ class _HomePageState extends State<HomePage> {
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () {
-                                  _showAddTodoDialog(context, true, todo);
+                                  _showAddRatingDialog(context, true, rating);
                                 },
                               ),
                               IconButton(
@@ -199,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.red.withOpacity(0.5),
                                 ),
                                 onPressed: () {
-                                  _todoBloc.add(DeleteTodo(todo.id!));
+                                  _ratingBloc.add(DeleteRating(rating.id!));
                                 },
                               ),
                             ],
@@ -209,11 +209,11 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                 );
-              } else if (state is TodoOperationSuccess) {
+              } else if (state is RatingOperationSuccess) {
                 print("Success ${state.message}");
-                _todoBloc.add(LoadTodos()); // Reload todos
+                _ratingBloc.add(LoadRatings()); // Reload ratings
                 return Container(); // Or display a success message
-              } else if (state is TodoError) {
+              } else if (state is RatingError) {
                 // print long error message with stacktrace
                 print("Error: ${state.errorMessage}");
                 return Center(child: Text(state.errorMessage));
@@ -227,7 +227,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.appColor,
         onPressed: () {
-          _showAddTodoDialog(context, false, null);
+          _showAddRatingDialog(context, false, null);
         },
         child: const Icon(
           Icons.star,
@@ -237,15 +237,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showAddTodoDialog(BuildContext context, bool isEdit, Todo? todos) {
+  void _showAddRatingDialog(
+      BuildContext context, bool isEdit, Rating? ratings) {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
     final dateController = TextEditingController();
 
     if (isEdit) {
-      titleController.text = todos!.title;
-      descriptionController.text = todos.description;
-      dateController.text = todos.date;
+      titleController.text = ratings!.title;
+      descriptionController.text = ratings.description;
+      dateController.text = ratings.date;
     }
     showDialog(
       context: context,
@@ -420,9 +421,9 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               child: Text(isEdit ? 'Ändern' : 'Ok'),
               onPressed: () {
-                final todo = isEdit
-                    ? Todo(
-                        id: todos!.id!,
+                final rating = isEdit
+                    ? Rating(
+                        id: ratings!.id!,
                         title: titleController.text,
                         description: descriptionController.text,
                         moderatorRating: moderatorValue ?? 0.0,
@@ -432,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                             ? DateFormat('yyyy-MM-dd').format(DateTime.now())
                             : dateController.text,
                         completed: titleController.text.isEmpty)
-                    : Todo(
+                    : Rating(
                         id: DateTime.now().toString(),
                         title: titleController.text,
                         description: descriptionController.text,
@@ -444,13 +445,13 @@ class _HomePageState extends State<HomePage> {
                         completed: false,
                       );
                 if (isEdit) {
-                  var updatedTo =
-                      todo.copyWith(completed: titleController.text.isNotEmpty);
-                  BlocProvider.of<TodoBloc>(context)
-                      .add(UpdateTodo(todo.id!, updatedTo));
+                  var updatedTo = rating.copyWith(
+                      completed: titleController.text.isNotEmpty);
+                  BlocProvider.of<RatingBloc>(context)
+                      .add(UpdateRating(rating.id!, updatedTo));
                   Navigator.pop(context);
                 } else {
-                  BlocProvider.of<TodoBloc>(context).add(AddTodo(todo));
+                  BlocProvider.of<RatingBloc>(context).add(AddRating(rating));
                   Navigator.pop(context);
                 }
               },

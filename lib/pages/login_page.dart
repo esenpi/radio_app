@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:radio_app/auth/auth_bloc.dart';
-import 'package:radio_app/blocs/moderator_rating/index.dart';
-import 'package:radio_app/blocs/todo/todo_bloc.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/index.dart';
+import 'package:radio_app/blocs/rating/rating_bloc.dart';
 import 'package:radio_app/model/moderator_rating.dart';
 import 'package:radio_app/pages/homepage.dart';
 import 'package:radio_app/repository/auth_repository.dart';
@@ -33,8 +33,8 @@ class _LoginPageState extends State<LoginPage> {
       create: (context) => AuthRepository(),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<TodoBloc>(
-            create: (context) => TodoBloc(FirestoreService()),
+          BlocProvider<RatingBloc>(
+            create: (context) => RatingBloc(FirestoreService()),
           ),
           BlocProvider(
             create: (context) => AuthBloc(

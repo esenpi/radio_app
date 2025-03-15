@@ -3,10 +3,10 @@ import 'dart:developer' as developer;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // import 'package:bloc/bloc.dart'; // This import is redundant
-import 'package:radio_app/blocs/moderator_rating/index.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/index.dart';
 import 'package:radio_app/model/moderator_rating.dart';
 // import '../../repository/firestore_repository.dart';
-import 'package:radio_app/blocs/moderator_rating/moderator_rating_repository.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/moderator_rating_repository.dart';
 
 class ModeratorRatingBloc
     extends Bloc<ModeratorRatingEvent, ModeratorRatingState> {
