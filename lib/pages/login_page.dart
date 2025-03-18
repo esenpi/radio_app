@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:radio_app/auth/auth_bloc.dart';
+import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/index.dart';
+import 'package:radio_app/blocs/rating/rating_bloc.dart';
+import 'package:radio_app/model/moderator_rating.dart';
+import 'package:radio_app/pages/homepage.dart';
+import 'package:radio_app/repository/auth_repository.dart';
+import 'package:radio_app/repository/firestore_repository.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,57 +29,88 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // a login page with input fields for username and password and a login button 
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Moderator Login'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            children: <Widget>[
-              // an x button on the right side within the input field in order to clear the input field
-              TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Username',
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      _usernameController.clear();
-                    },
-                    icon: const Icon(Icons.clear),
-                  ),
+    return RepositoryProvider(
+      create: (context) => AuthRepository(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<RatingBloc>(
+            create: (context) => RatingBloc(FirestoreService()),
+          ),
+          BlocProvider(
+            create: (context) => AuthBloc(
+              authRepository: RepositoryProvider.of<AuthRepository>(context),
+            ),
+          ),
+        ],
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return const HomePage();
+              }
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text('Moderator Login'),
                 ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Password',
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      _passwordController.clear();
-                    },
-                    icon: const Icon(Icons.clear),
-                  ),
+                body: Column(
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          children: <Widget>[
+                            TextField(
+                              controller: _usernameController,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Username',
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    _usernameController.clear();
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            TextField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Password',
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    _passwordController.clear();
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                ),
+                              ),
+                              obscureText: true,
+                            ),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Implement login logic here
+                              },
+                              child: const Text('Login'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // login logic
-                },
-                child: const Text('Login'),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 }
-
-
