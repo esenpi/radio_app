@@ -4,6 +4,7 @@ class Song {
   final String album;
   final String thumbnailUrl;
   final String songUrl;
+  final bool wished;
 
   Song({
     required this.title,
@@ -11,6 +12,7 @@ class Song {
     required this.album,
     required this.thumbnailUrl,
     required this.songUrl,
+    required this.wished,
   });
 
   factory Song.fromMap(Map<String, dynamic> data) {
@@ -20,6 +22,7 @@ class Song {
       album: data['album'],
       thumbnailUrl: data['thumbnailUrl'],
       songUrl: data['songUrl'],
+      wished: data['wished'],
     );
   }
 }

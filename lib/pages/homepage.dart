@@ -1,3 +1,20 @@
+/// The `HomePage` class represents the main page of the radio app where users can view and manage ratings.
+///
+/// This class is a `StatefulWidget` that maintains the state of the home page.
+/// It uses the `BlocProvider` to manage the state of the `RatingBloc` and `AuthBloc`.
+///
+/// The `HomePage` contains the following key components:
+/// - An `AppBar` with a title and a logout button.
+/// - A `BlocListener` for the `AuthBloc` to handle user sign-out and navigation to the sign-in page.
+/// - A `BlocBuilder` for the `RatingBloc` to display the list of ratings and handle different states (loading, loaded, success, error).
+/// - A `FloatingActionButton` to add new ratings.
+///
+/// The `_showAddRatingDialog` method is used to display a dialog for adding or editing ratings.
+/// It includes fields for rating the moderator and playlist, and selecting a date.
+///
+/// The `initState` method initializes the state by loading the ratings.
+///
+/// The `build` method constructs the UI of the home page.
 import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/moderator_rating_bloc.dart';
 import 'package:radio_app/blocs/moderator_page%20(prospective%20feature%20-%20not%20used)/moderator_rating_event.dart';
 import 'package:radio_app/blocs/rating/rating_bloc.dart';

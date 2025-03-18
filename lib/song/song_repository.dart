@@ -8,24 +8,29 @@ class SongRepository {
 
   Future<List<Song>> fetchAllDocumentIDs() async {
     QuerySnapshot snapshot = await _firestore.collection('songs2').get();
-    return snapshot.docs.map((doc) => Song(
-      title: doc['title'],
-      album: doc['album'],
-      interpreter: doc['interpreter'],
-      songUrl: doc['songUrl'],
-      thumbnailUrl: doc['thumbnailUrl'],
-    )).toList();
+    return snapshot.docs
+        .map((doc) => Song(
+              title: doc['title'],
+              album: doc['album'],
+              interpreter: doc['interpreter'],
+              songUrl: doc['songUrl'],
+              thumbnailUrl: doc['thumbnailUrl'],
+              wished: doc['wished'] ?? false,
+            ))
+        .toList();
     //return snapshot.docs.map((doc) => doc.id).toList();
   }
 
   Future<Song> fetchSong(String docId) async {
-    DocumentSnapshot doc = await _firestore.collection('songs2').doc(docId).get();
+    DocumentSnapshot doc =
+        await _firestore.collection('songs2').doc(docId).get();
     return Song(
       title: doc['title'],
       album: doc['album'],
       interpreter: doc['interpreter'],
       songUrl: doc['songUrl'],
       thumbnailUrl: doc['thumbnailUrl'],
+      wished: doc['wished'] ?? false,
     );
   }
 
@@ -50,7 +55,7 @@ class SongRepository {
       'interpreter': song.interpreter,
       'songUrl': song.songUrl,
       'thumbnailUrl': song.thumbnailUrl,
+      'wished': song.wished,
     });
   }
-  
 }
